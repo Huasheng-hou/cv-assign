@@ -1,16 +1,19 @@
-# This is a sample Python script.
+from PIL import Image
+import numpy as np
+from sift import GuassianKernel, convolve, getDoG
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+image = Image.open("images/img1.ppm")
+imgarr = np.asarray(image)
+
+T, S, Sigma = 0.04, 3, 1.6
+DoG_Pyramid, Guass_Pyramid, O = getDoG(img=imgarr,n=1, sigma0=Sigma, S=S)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+extremas = []
+for i in range(len(DoG_Pyramid)):
+    octave = DoG_Pyramid[i]
+    points = []
+    for j in range(1, len(octave)):
+        getExtrema()
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
