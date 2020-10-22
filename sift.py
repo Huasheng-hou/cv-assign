@@ -96,17 +96,17 @@ def getDoG(img,n,sigma0,S=None,O=None):
     return DoG_Pyramid,Guass_Pyramid,O  #返回高斯金字塔和高斯差分金字塔
 
 
-def getExtrema(img, img_prev, img_next, threshhold):
+def Extrema(img, img_prev, img_next, threshhold):
     extremas = []
     for i in range(img.shape[0]):
         for j in range(img.shape[1]):
             val = img[i][j]
             eight_neiborhood_prev = img_prev[max(0, i - 1):min(i + 2, img_prev.shape[0]),
                                     max(0, j - 1):min(j + 2, img_prev.shape[1])]
-            eight_neiborhood = img_prev[max(0, i - 1):min(i + 2, img_prev.shape[0]),
-                               max(0, j - 1):min(j + 2, img_prev.shape[1])]
-            eight_neiborhood_next = img_prev[max(0, i - 1):min(i + 2, img_prev.shape[0]),
-                                    max(0, j - 1):min(j + 2, img_prev.shape[1])]
+            eight_neiborhood = img[max(0, i - 1):min(i + 2, img.shape[0]),
+                               max(0, j - 1):min(j + 2, img.shape[1])]
+            eight_neiborhood_next = img_next[max(0, i - 1):min(i + 2, img_next.shape[0]),
+                                    max(0, j - 1):min(j + 2, img_next.shape[1])]
             # 阈值化，在高斯差分金字塔中找极值
             # 如果某点大于阈值，并且，比周围8个点、上下18个点共26个点都大或者都小，则认为是关键点
             if np.abs(val) > threshhold and \
@@ -115,4 +115,17 @@ def getExtrema(img, img_prev, img_next, threshhold):
                      or (val < 0 and (val <= eight_neiborhood_prev).all() and (
                                     val <= eight_neiborhood).all() and (val <= eight_neiborhood_next).all())):
                 extremas.append((i, j))
+    return extremas
+
+
+def getExtremas(DoG_Pyramid=None, T=None, S=None):
+    threshold = 0.5 * T / S
+    extremas = []
+    for i in range(len(DoG_Pyramid)):
+        octave = DoG_Pyramid[i]
+        oc = []
+        for j in range(1, len(octave) - 1):
+            points = Extrema(img=octave[j], img_prev=octave[j - 1], img_next=octave[j + 1], threshhold=threshold)
+            oc.append(points)
+        extremas.append(oc)
     return extremas
